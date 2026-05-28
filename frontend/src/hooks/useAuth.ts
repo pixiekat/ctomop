@@ -60,7 +60,8 @@ export const useAuth = () => {
       console.error('Logout failed:', error);
     } finally {
       setCurrentUser(null);
-      window.location.href = '/login';
+      // Full-page navigation — Router basename does not apply, so prefix manually.
+      window.location.href = `${process.env.PUBLIC_URL}/login`;
     }
   };
 

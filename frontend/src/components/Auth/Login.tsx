@@ -21,7 +21,10 @@ export const Login: React.FC = () => {
       });
 
       if (response.data.user) {
-        window.location.href = '/';
+        // Full page reload to refresh auth state — Router basename does not
+        // apply to window.location, so include PUBLIC_URL so we land on
+        // /ctomop/ (or / if mounted at root) instead of bare "/".
+        window.location.href = `${process.env.PUBLIC_URL}/`;
       }
     } catch (err: any) {
       setError(err.response?.data?.error || 'Login failed. Please try again.');

@@ -1,8 +1,12 @@
 import axios from 'axios';
 import { ACCESS_TOKEN_KEY, refreshAccessToken, clearTokens } from '../utils/oauth';
 
+// PUBLIC_URL holds the subpath prefix the app is mounted under (e.g. "/ctomop")
+// or an empty string when mounted at root. It is baked at build time from the
+// "homepage" field in package.json (prod) or the PUBLIC_URL env var (dev), so
+// the same code works locally and behind a reverse proxy in production.
 const api = axios.create({
-  baseURL: '/api',
+  baseURL: `${process.env.PUBLIC_URL}/api`,
   headers: {
     'Content-Type': 'application/json',
   },
@@ -73,10 +77,11 @@ api.interceptors.response.use(
         isRefreshing = false;
       }
 
-      // Refresh failed — clear tokens and redirect to login
+      // Refresh failed — clear tokens and redirect to login.
+      // Full-page navigation, so Router basename does not apply: prefix manually.
       clearTokens();
       if (!window.location.pathname.includes('/login')) {
-        window.location.href = '/login';
+        window.location.href = `${process.env.PUBLIC_URL}/login`;
       }
     }
 

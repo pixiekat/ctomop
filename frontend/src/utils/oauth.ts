@@ -11,9 +11,14 @@
  */
 
 const CLIENT_ID = process.env.REACT_APP_OAUTH_CLIENT_ID ?? 'ctomop-smart-app';
+// PUBLIC_URL = the subpath prefix the app is mounted under (e.g. "/ctomop"),
+// baked at build time from "homepage" in package.json. Empty when at root.
+// The authorization server compares the redirect_uri exactly against the
+// value registered on its Application record, so this must match what's
+// stored in the Django oauth-toolkit Application admin.
 const REDIRECT_URI =
   process.env.REACT_APP_OAUTH_REDIRECT_URI ??
-  `${window.location.origin}/auth/callback`;
+  `${window.location.origin}${process.env.PUBLIC_URL}/auth/callback`;
 const SCOPES = 'openid patient/*.read offline_access';
 
 // Storage keys
@@ -81,7 +86,10 @@ export async function startPkceLogin(): Promise<void> {
     code_challenge_method: 'S256',
   });
 
-  window.location.assign(`/o/authorize/?${params.toString()}`);
+  // django-oauth-toolkit serves /o/authorize/ — prefix with PUBLIC_URL so the
+  // browser hits /ctomop/o/authorize/ in prod (Django resolves it correctly
+  // under FORCE_SCRIPT_NAME).
+  window.location.assign(`${process.env.PUBLIC_URL}/o/authorize/?${params.toString()}`);
 }
 
 export interface TokenResponse {
@@ -115,7 +123,7 @@ export async function exchangeCodeForToken(
     code_verifier: verifier,
   });
 
-  const resp = await fetch('/o/token/', {
+  const resp = await fetch(`${process.env.PUBLIC_URL}/o/token/`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
     body: body.toString(),
@@ -152,7 +160,7 @@ export async function refreshAccessToken(): Promise<TokenResponse | null> {
     client_id: CLIENT_ID,
   });
 
-  const resp = await fetch('/o/token/', {
+  const resp = await fetch(`${process.env.PUBLIC_URL}/o/token/`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
     body: body.toString(),

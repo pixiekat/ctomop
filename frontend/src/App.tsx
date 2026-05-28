@@ -91,7 +91,14 @@ const App: React.FC = () => {
   return (
     <ThemeProvider theme={theme}>
       <CssBaseline />
-      <Router>
+      {/*
+        basename keeps client-side routes in sync with the subpath the app is
+        mounted under (e.g. /ctomop on prod behind a reverse proxy). CRA bakes
+        process.env.PUBLIC_URL from the "homepage" field in package.json at
+        build time, and from the PUBLIC_URL env var at dev-server time. When
+        mounted at the root the value is "", so this stays a safe no-op.
+      */}
+      <Router basename={process.env.PUBLIC_URL}>
         <AppRoutes />
       </Router>
     </ThemeProvider>

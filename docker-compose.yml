@@ -25,6 +25,9 @@ services:
       DEBUG: ${DEBUG}
       PRODUCTION_URL: ${PRODUCTION_URL}
       PORT: 8000
+      # Mount under /ctomop behind the Apache reverse proxy. Must match the
+      # "homepage" baked into the React build and the Apache ProxyPass prefix.
+      SUB_PATH: /ctomop
     ports:
       - "8000:8000"
     command: >

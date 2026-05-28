@@ -143,8 +143,18 @@ TIME_ZONE = 'UTC'
 USE_I18N = True
 USE_TZ = True
 
+# ── Subpath mounting ─────────────────────────────────────────────────────────
+# SUB_PATH lets this app live under a prefix (e.g. /ctomop) behind a reverse
+# proxy, without a dedicated subdomain. Blank = mounted at root (default).
+# FORCE_SCRIPT_NAME is Django's built-in "I live under this prefix" switch:
+# it prefixes everything reverse() / redirects / admin / login generate.
+SUB_PATH = os.environ.get('SUB_PATH', '').rstrip('/')   # '' or '/ctomop'
+
+FORCE_SCRIPT_NAME = SUB_PATH or None   # None when blank, so root still works
+
 # Static files
-STATIC_URL = '/static/'
+# Static must carry the same prefix or every asset 404s under the subpath.
+STATIC_URL = f'{SUB_PATH}/static/'     # → '/ctomop/static/' (or '/static/' if blank)
 STATIC_ROOT = BASE_DIR / 'staticfiles'
 
 # Only include frontend static files if they exist
